@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Enrollment Management System</title>
+    
+    <!-- Meta Tags for SEO -->
+    <meta name="description" content="A professional Student Enrollment Management System built using HTML, CSS, JavaScript, Bootstrap 5, and JsonPowerDB (JPDB) for serverless database operations.">
+    <meta name="author" content="Anash Khan">
+    
+    <!-- Google Fonts (Outfit and Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loaderOverlay" class="loader-overlay d-none">
+        <div class="text-center text-white">
+            <div class="spinner-border text-primary spinner-large" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 fs-5 fw-semibold tracking-wide">Syncing with JsonPowerDB...</p>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark-glass fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#" id="navbarBrandLink">
+                <div class="brand-icon-wrapper me-2">
+                    <i class="bi bi-mortarboard-fill brand-icon"></i>
+                </div>
+                <div>
+                    <span class="brand-title"><h1>Student Management System</h1></span>
+                    <span class="brand-subtitle d-block text-muted">Enrollment Portal</span>
+                </div>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center mt-3 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" aria-current="page"><i class="bi bi-house-door-fill me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <button class="btn btn-outline-light-glass btn-sm px-3 rounded-pill my-2 my-lg-0" data-bs-toggle="modal" data-bs-target="#settingsModal" id="btnConfigSettings">
+                            <i class="bi bi-database-fill-gear me-1"></i> JPDB Settings
+                        </button>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="mailto:anashkhan.dev@gmail.com" class="dev-profile-badge d-flex align-items-center text-decoration-none">
+                            <div class="avatar-circle">AK</div>
+                            <span class="ms-2 d-none d-xl-inline text-white fw-medium">Anash Khan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container content-wrapper">
+        <!-- Dashboard Header -->
+        <div class="row mb-4">
+            <div class="col-12 text-center text-lg-start">
+                <h1 class="h2 fw-bold text-gradient">Student Enrollment Management System</h1>
+                <p class="text-muted">Perform secure CRUD operations powered by Login2Xplore's high-performance JsonPowerDB</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Side: Form Section (Col-lg-8) -->
+            <div class="col-lg-8">
+                <div class="card glass-card h-100 shadow-sm border-0">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-fill-add text-primary fs-3 me-2"></i>
+                            <h2 class="h5 fw-bold mb-0">Student Information</h2>
+                        </div>
+                        <span class="badge bg-secondary-glass py-2 px-3 rounded-pill text-secondary" id="formStatusBadge">Initial State</span>
+                    </div>
+                    
+                    <div class="card-body px-4 pb-4">
+                        <!-- Alert message container -->
+                        <div id="formAlert" class="alert alert-info d-none alert-dismissible fade show" role="alert">
+                            <span id="formAlertMsg"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Enrollment Form -->
+                        <form id="studentForm" novalidate autocomplete="off">
+                            <div class="row g-3">
+                                
+                                <!-- Roll Number (Primary Key) -->
+                                <div class="col-md-6">
+                                    <label for="rollNo" class="form-label fw-semibold">Roll Number <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash"></i></span>
+                                        <input type="number" class="form-control border-start-0" id="rollNo" placeholder="Enter Roll Number" min="1" required>
+                                        <div class="invalid-feedback">Please enter a valid positive Roll Number.</div>
+                                    </div>
+                                    <div class="form-text">Press Tab or Enter to search database.</div>
+                                </div>
+
+                                <!-- Class -->
+                                <div class="col-md-6">
+                                    <label for="studentClass" class="form-label fw-semibold">Class / Grade <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-book"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="studentClass" placeholder="e.g. Class 10-A, BTech CS" disabled required>
+                                        <div class="invalid-feedback">Class is required.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Full Name -->
+                                <div class="col-md-12">
+                                    <label for="fullName" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-fill"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="fullName" placeholder="Enter Student's Full Name" disabled required>
+                                        <div class="invalid-feedback">Full name is required (letters only, min 3 characters).</div>
+                                    </div>
+                                </div>
+
+                                <!-- Email Address -->
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope-fill"></i></span>
+                                        <input type="email" class="form-control border-start-0" id="email" placeholder="student@example.com" disabled required>
+                                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone-fill"></i></span>
+                                        <input type="tel" class="form-control border-start-0" id="phone" placeholder="10-Digit Mobile Number" disabled required>
+                                        <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Birth Date -->
+                                <div class="col-md-6">
+                                    <label for="birthDate" class="form-label fw-semibold">Birth Date <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                                        <input type="date" class="form-control border-start-0" id="birthDate" disabled required>
+                                        <div class="invalid-feedback">Birth date is required and must be in the past.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Enrollment Date -->
+                                <div class="col-md-6">
+                                    <label for="enrollmentDate" class="form-label fw-semibold">Enrollment Date <span class="text-danger">*</span></label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-check-fill"></i></span>
+                                        <input type="date" class="form-control border-start-0" id="enrollmentDate" disabled required>
+                                        <div class="invalid-feedback">Enrollment date is required.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <label for="address" class="form-label fw-semibold">Permanent Address <span class="text-danger">*</span></label>
+                                        <span id="charCount" class="text-muted small">0 / 200 characters</span>
+                                    </div>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt-fill text-align-start"></i></span>
+                                        <textarea class="form-control border-start-0" id="address" rows="3" placeholder="Enter complete residential address" maxlength="200" disabled required></textarea>
+                                        <div class="invalid-feedback">Address is required (min 10 characters).</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Action Buttons -->
+                            <div class="row mt-4 pt-3 border-top">
+                                <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+                                    <button type="button" id="btnSave" class="btn btn-primary px-4 py-2 fw-semibold rounded-pill shadow-sm" disabled>
+                                        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Save Record
+                                    </button>
+                                    <button type="button" id="btnUpdate" class="btn btn-success px-4 py-2 fw-semibold text-white rounded-pill shadow-sm" disabled>
+                                        <i class="bi bi-pencil-square me-1"></i> Update Details
+                                    </button>
+                                    <button type="button" id="btnReset" class="btn btn-outline-secondary px-4 py-2 fw-semibold rounded-pill">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Profile Preview Card (Col-lg-4) -->
+            <div class="col-lg-4">
+                <div class="card glass-card student-preview-card shadow-sm border-0 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 text-center">
+                        <h2 class="h5 fw-bold mb-0 text-muted text-uppercase tracking-wider">Profile Preview</h2>
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                        <div class="avatar-preview-container mb-3 shadow">
+                            <div id="previewAvatar" class="avatar-placeholder">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                        </div>
+                        
+                        <h3 id="previewName" class="h5 fw-bold mb-1 text-dark-emphasis">- - - - -</h3>
+                        <span id="previewClassBadge" class="badge bg-primary-glass text-primary px-3 py-2 rounded-pill mb-4">Class Code</span>
+
+                        <div class="w-100 preview-details-list">
+                            <div class="preview-item d-flex justify-content-between py-2 border-bottom text-start">
+                                <span class="text-muted"><i class="bi bi-hash me-2 text-primary"></i>Roll No:</span>
+                                <span id="previewRoll" class="fw-semibold text-dark">-</span>
+                            </div>
+                            <div class="preview-item d-flex justify-content-between py-2 border-bottom text-start">
+                                <span class="text-muted"><i class="bi bi-envelope me-2 text-primary"></i>Email:</span>
+                                <span id="previewEmail" class="fw-semibold text-dark text-truncate max-width-150">-</span>
+                            </div>
+                            <div class="preview-item d-flex justify-content-between py-2 border-bottom text-start">
+                                <span class="text-muted"><i class="bi bi-telephone me-2 text-primary"></i>Phone:</span>
+                                <span id="previewPhone" class="fw-semibold text-dark">-</span>
+                            </div>
+                            <div class="preview-item d-flex justify-content-between py-2 border-bottom text-start">
+                                <span class="text-muted"><i class="bi bi-calendar-event me-2 text-primary"></i>DOB:</span>
+                                <span id="previewDob" class="fw-semibold text-dark">-</span>
+                            </div>
+                            <div class="preview-item d-flex justify-content-between py-2 border-bottom text-start">
+                                <span class="text-muted"><i class="bi bi-calendar-check me-2 text-primary"></i>Enrolled:</span>
+                                <span id="previewEnrollDate" class="fw-semibold text-dark">-</span>
+                            </div>
+                            <div class="preview-item d-flex flex-column py-2 text-start">
+                                <span class="text-muted mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>Address:</span>
+                                <p id="previewAddress" class="fw-normal text-dark text-break small mb-0">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JPDB Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="settingsModalLabel"><i class="bi bi-database-fill-gear text-primary me-2"></i>JsonPowerDB Config</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        <div class="mb-3">
+                            <label for="configToken" class="form-label fw-semibold">Connection Token <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="configToken" value="90933024|-31949323136270921|90949646" required>
+                            <div class="form-text">Paste your JPDB token from the developer dashboard.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="configDbName" class="form-label fw-semibold">Database Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="configDbName" value="SCHOOL-DB" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="configRelName" class="form-label fw-semibold">Relation Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="configRelName" value="STUDENT-TABLE" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="configBaseUrl" class="form-label fw-semibold">JPDB Base URL <span class="text-danger">*</span></label>
+                            <input type="url" class="form-control" id="configBaseUrl" value="http://api.login2explore.com:5577" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="btnSaveSettings">Save Config</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1090;">
+        <!-- Toasts are dynamically injected here by script.js -->
+    </div>
+
+    <!-- Page Footer -->
+    <footer class="footer mt-auto py-3 bg-dark-glass text-center border-top border-light-glass">
+        <div class="container text-center">
+            <p class="mb-1 text-light-emphasis small fw-medium">
+                Developed with ❤️ by <a href="mailto:anashkhan.dev@gmail.com" class="text-primary text-decoration-none">Anash Khan</a>
+            </p>
+            <div class="d-flex justify-content-center align-items-center gap-3 mt-2">
+                <a href="mailto:anashkhan.dev@gmail.com" class="text-muted text-decoration-none hover-primary small" title="Email Developer">
+                    <i class="bi bi-envelope-fill me-1"></i> anashkhan.dev@gmail.com
+                </a>
+                <span class="text-muted">|</span>
+                <a href="https://github.com" class="text-muted text-decoration-none hover-primary small" target="_blank" rel="noopener noreferrer" title="GitHub Repository">
+                    <i class="bi bi-github me-1"></i> GitHub Profile
+                </a>
+            </div>
+            <p class="text-muted mt-2 mb-0 extra-small">Powered by Login2Xplore JsonPowerDB</p>
+        </div>
+    </footer>
+
+    <!-- jQuery CDN (Required for JPDB common script) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Bootstrap 5 Bundle JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JPDB Commons Library JS CDN -->
+    <script src="https://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+    
+    <!-- Custom Application Script -->
+    <script src="script.js"></script>
+</body>
+</html>
